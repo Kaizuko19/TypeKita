@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
-import wordBank from "../../wordBank";  // Ensure the correct import path
+import wordBank from "../../wordBank"; // Ensure the correct import path
 
 const Game = () => {
   const [currentParagraph, setCurrentParagraph] = useState("");
   const [typedText, setTypedText] = useState("");
-  const [timer, setTimer] = useState(120); // 2-minute timer
+  const [elapsedTime, setElapsedTime] = useState(0); // Timer for WPM calculation
   const [isGameOver, setIsGameOver] = useState(false);
   const [correctWords, setCorrectWords] = useState(0); // Track correct words
-  const [totalWords, setTotalWords] = useState(0); // Track total words typed
+  const [startTime, setStartTime] = useState(null); // Track game start time
+  const [hasStartedTyping, setHasStartedTyping] = useState(false); // Flag to check if typing started
 
   // Generate a random paragraph
   const generateParagraph = () => {
@@ -17,31 +18,24 @@ const Game = () => {
 
   // Handle user input and letter-by-letter comparison
   const handleInputChange = (e) => {
+    if (isGameOver) return; // Prevent changes if the game is already over
+
     const input = e.target.value;
     setTypedText(input);
 
- // Check if the input matches the paragraph
- if (input === currentParagraph) {
-    setCorrectWords(correctWords + currentParagraph.split(" ").length); // Increase correct words count
-    setTotalWords(totalWords + currentParagraph.split(" ").length); // Increase total words count
-    setTypedText(""); // Clear input
-    generateParagraph(); // Generate a new paragraph
-  } else {
-    setTotalWords(totalWords + input.split(" ").length); // Increase total words count for each input
-  }
-};
-
-  // Timer countdown
-  useEffect(() => {
-    if (timer > 0) {
-      const countdown = setInterval(() => {
-        setTimer((prevTimer) => prevTimer - 1);
-      }, 1000);
-      return () => clearInterval(countdown);
-    } else {
-      setIsGameOver(true);
+    // Start timing when the user types the first letter
+    if (!hasStartedTyping) {
+      setHasStartedTyping(true);
+      setStartTime(Date.now()); // Set the start time
     }
-  }, [timer]);
+
+    // Check if the input matches the paragraph
+    if (input === currentParagraph) {
+      setCorrectWords(currentParagraph.split(" ").length); // Count correct words
+      setIsGameOver(true); // End the game when the paragraph is completed
+      setElapsedTime((Date.now() - startTime) / 1000); // Set elapsed time
+    }
+  };
 
   // Start the game with an initial paragraph
   useEffect(() => {
@@ -68,14 +62,20 @@ const Game = () => {
     });
   };
 
-   // Calculate words per second and accuracy
-   const calculateWPS = () => {
-    const secondsElapsed = 120 - timer; // Total time in seconds
-    return secondsElapsed > 0 ? (correctWords / secondsElapsed).toFixed(2) : 0;
+  // Calculate words per minute (WPM)
+  const calculateWPM = () => {
+    if (elapsedTime > 0) {
+      const wordsPerMinute = ((correctWords / (elapsedTime / 60)) || 0).toFixed(2);
+      return wordsPerMinute;
+    }
+    return 0; // Return 0 if elapsedTime is not set
   };
 
+  // Calculate accuracy (optional metric)
   const calculateAccuracy = () => {
-    return totalWords > 0 ? ((correctWords / totalWords) * 100).toFixed(2) : 0;
+    return typedText.length > 0
+      ? ((typedText.split(" ").length / currentParagraph.split(" ").length) * 100).toFixed(2)
+      : 0;
   };
 
   return (
@@ -83,8 +83,7 @@ const Game = () => {
       {!isGameOver ? (
         <>
           <h2>TypeKita: Play as Guest</h2>
-          <p>Time Remaining: {timer} seconds</p>
-          <p>Score: {score}</p>
+
           <div
             style={{
               margin: "20px",
@@ -98,32 +97,26 @@ const Game = () => {
           >
             {renderParagraphWithColors()}
           </div>
-          {/* Invisible input field for typing */}
+
           <input
             type="text"
             value={typedText}
             onChange={handleInputChange}
             style={{
-              width: "80%",
-              height: "40px",
-              padding: "10px",
-              fontSize: "1rem",
-              border: "1px solid #ccc",
-              borderRadius: "5px",
-              opacity: 0, // Make it invisible
-              position: "absolute", // Position it absolutely
-              left: "50%", // Center it horizontally
-              transform: "translateX(-50%)", // Center it
+                opacity: 0, // Make it invisible
+                position: "absolute", // Position it absolutely
+                left: "-9999px", // Push it out of view
             }}
             placeholder="Type the paragraph here"
             disabled={isGameOver}
             autoFocus // Automatically focus on the input
-          />
+            />
+
         </>
       ) : (
         <>
           <h2>Game Over!</h2>
-          <p>Your Final Score: {score}</p>
+          <p>Your Final Score:</p>
           <button
             onClick={() => window.location.reload()}
             style={{
@@ -138,6 +131,12 @@ const Game = () => {
           >
             Play Again
           </button>
+
+          {/* Show metrics only when game is over */}
+          <div style={{ marginTop: "20px" }}>
+            <p>Words Per Minute (WPM): {calculateWPM()}</p>
+            <p>Accuracy: {calculateAccuracy()}%</p>
+          </div>
         </>
       )}
     </div>
