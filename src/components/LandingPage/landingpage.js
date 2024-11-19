@@ -1,5 +1,5 @@
 import React from "react";
-import "./LandingPage.css";
+import "./landingpage.css";
 
 const LandingPage = ({ onGuestPlay, onLogin, onSignUp }) => {
   return (
