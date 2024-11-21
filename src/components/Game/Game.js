@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import wordBank from "../../wordBank"; // Ensure the correct import path
+import wordBank from "../../components/Game/wordBank"; // Ensure the correct import path
 
 const Game = () => {
   const [currentParagraph, setCurrentParagraph] = useState("");

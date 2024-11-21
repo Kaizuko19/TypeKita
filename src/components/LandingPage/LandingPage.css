@@ -7,6 +7,10 @@
     background: #f5f5f5;
     color: #333;
   }
+
+  .landing-card {
+    background-color: aquamarine;
+  }
   
   .landing-header {
     text-align: center;
