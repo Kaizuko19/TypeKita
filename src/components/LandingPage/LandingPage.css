@@ -4,12 +4,8 @@
     align-items: center;
     justify-content: center;
     height: 100vh;
-    background: #f5f5f5;
+    background: #fcfbf1;
     color: #333;
-  }
-
-  .landing-card {
-    background-color: aquamarine;
   }
   
   .landing-header {
@@ -23,12 +19,13 @@
   }
   
   .landing-header p {
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     color: #666;
   }
   
   .button-group {
     display: flex;
+    flex-direction: column;
     gap: 15px;
   }
   
@@ -45,18 +42,16 @@
     opacity: 0.9;
   }
   
-  .guest-play-btn {
-    background: #2196f3;
-    color: white;
+  .guest-play-btn, .login-btn, .signup-btn {
+    background: #00c49a;
+    color: #000;
+    padding: 20px 20px 20px 20px;
+    margin-bottom: 10px;
+    font-size: 25px;
+    border-radius: 10px;
+    border: 2px solid black;
+    font-weight: bold;
   }
   
-  .login-btn {
-    background: #ff9800;
-    color: white;
-  }
-  
-  .signup-btn {
-    background: #4caf50;
-    color: white;
-  }
+
   
